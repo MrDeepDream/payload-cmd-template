@@ -245,10 +245,89 @@ npm run dev
 
 ### First Time Setup
 
+**Option A: Using Sample Data (Recommended for Testing)**
+
+Quickly populate your database with sample content:
+
+```bash
+# Make sure MongoDB is running, then:
+npm run seed
+```
+
+This will create:
+- 1 admin user (email: `admin@example.com`, password: `password123`)
+- 5 sample authors
+- 8 categories
+- 15 tags
+- 8 sample articles with rich content
+
+After seeding, you can:
+- Login to admin: http://localhost:3000/admin
+- View frontend: http://localhost:3001
+
+**To reset and re-seed:**
+```bash
+npm run seed:reset  # Clears all data
+npm run seed        # Adds sample data
+```
+
+**Option B: Manual Setup**
+
 1. Navigate to `http://localhost:3000/admin`
 2. Create your first admin user account
 3. Create some content (authors, categories, articles)
 4. Visit `http://localhost:3001` to see your frontend!
+
+## Database Seeding
+
+The project includes a seeding system with realistic sample data to help you get started quickly.
+
+### Available Commands
+
+```bash
+# Populate database with sample data
+npm run seed
+
+# Reset database (removes all data)
+npm run seed:reset
+```
+
+### Sample Data Includes
+
+- **Admin User**: Pre-configured admin account for immediate access
+- **Authors**: 5 diverse journalist profiles with bios and social links
+- **Categories**: 8 news categories (Politics, Technology, Business, Science, Health, Environment, World, Sports)
+- **Tags**: 15 commonly used tags
+- **Articles**: 8 full-length articles with:
+  - Rich text content
+  - Proper formatting (headings, lists, quotes)
+  - Realistic metadata
+  - Featured and breaking news flags
+  - Author and category relationships
+
+### Customizing Seed Data
+
+Edit the files in `src/seed/data/` to customize sample content:
+- `authors.ts` - Author profiles
+- `categories.ts` - News categories
+- `tags.ts` - Article tags
+- `articles.ts` - Sample articles
+
+### Docker Seeding
+
+When using Docker, you can seed the database after starting containers:
+
+```bash
+# Start containers
+docker-compose up -d
+
+# Run seed command in backend container
+docker-compose exec backend npm run seed
+
+# Or reset and seed
+docker-compose exec backend npm run seed:reset
+docker-compose exec backend npm run seed
+```
 
 ## Project Structure
 
@@ -261,6 +340,13 @@ npm run dev
 │   │   ├── Tags.ts           # Tags collection
 │   │   ├── Media.ts          # Media collection
 │   │   └── Users.ts          # Users collection
+│   ├── seed/                 # Database seeding
+│   │   ├── data/             # Sample data
+│   │   │   ├── authors.ts
+│   │   │   ├── categories.ts
+│   │   │   ├── tags.ts
+│   │   │   └── articles.ts
+│   │   └── index.ts          # Seed script
 │   ├── payload.config.ts     # Main Payload configuration
 │   └── server.ts             # Express server entry point
 ├── frontend/                 # Next.js frontend

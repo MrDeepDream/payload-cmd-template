@@ -1,0 +1,17 @@
+export const tags = [
+  { name: 'Breaking News', slug: 'breaking-news' },
+  { name: 'Analysis', slug: 'analysis' },
+  { name: 'Interview', slug: 'interview' },
+  { name: 'Investigation', slug: 'investigation' },
+  { name: 'Opinion', slug: 'opinion' },
+  { name: 'AI', slug: 'ai' },
+  { name: 'Climate Change', slug: 'climate-change' },
+  { name: 'Economy', slug: 'economy' },
+  { name: 'Election', slug: 'election' },
+  { name: 'Innovation', slug: 'innovation' },
+  { name: 'Research', slug: 'research' },
+  { name: 'Policy', slug: 'policy' },
+  { name: 'Startup', slug: 'startup' },
+  { name: 'Healthcare', slug: 'healthcare' },
+  { name: 'Energy', slug: 'energy' },
+];
