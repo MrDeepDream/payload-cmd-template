@@ -1,4 +1,6 @@
 import { buildConfig } from 'payload/config';
+import { mongooseAdapter } from '@payloadcms/db-mongodb';
+import { slateEditor } from '@payloadcms/richtext-slate';
 import path from 'path';
 import Users from './collections/Users';
 import Articles from './collections/Articles';
@@ -17,6 +19,7 @@ export default buildConfig({
       ogImage: '/assets/og-image.jpg',
     },
   },
+  editor: slateEditor({}),
   collections: [
     Users,
     Articles,
@@ -31,10 +34,9 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
   },
-  db: {
-    type: 'mongodb',
+  db: mongooseAdapter({
     url: process.env.MONGODB_URI || 'mongodb://localhost:27017/payload-news',
-  },
+  }),
   rateLimit: {
     max: 2000,
   },

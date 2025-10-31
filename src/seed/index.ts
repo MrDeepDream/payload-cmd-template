@@ -19,9 +19,8 @@ async function seed() {
     // Initialize Payload
     await payload.init({
       secret: PAYLOAD_SECRET,
-      mongoURL: MONGODB_URI,
       local: true,
-      onInit: () => {
+      onInit: async () => {
         payload.logger.info('Payload initialized for seeding');
       },
     });
