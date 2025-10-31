@@ -1,9 +1,16 @@
 # Payload CMS News Site Boilerplate
 
-A production-ready boilerplate for building news websites with Payload CMS. This setup includes all the essential collections and features needed for a modern news platform.
+A production-ready, full-stack boilerplate for building news websites with Payload CMS (backend) and Next.js (frontend). This setup includes all the essential collections and features needed for a modern news platform.
+
+## Architecture
+
+This project consists of two parts:
+- **Backend** (`/`): Payload CMS for content management and API
+- **Frontend** (`/frontend`): Next.js website for public-facing content
 
 ## Features
 
+### Backend (Payload CMS)
 - **Articles Management**: Full-featured article system with drafts, versioning, and publishing workflow
 - **Author Profiles**: Dedicated author management with bios, avatars, and social media links
 - **Categories & Tags**: Hierarchical category structure and tag system for content organization
@@ -14,6 +21,19 @@ A production-ready boilerplate for building news websites with Payload CMS. This
 - **Featured & Breaking News**: Special flags for highlighting important content
 - **Related Articles**: Automatic related content suggestions
 - **Reading Time**: Estimated reading time for articles
+- **REST & GraphQL APIs**: Auto-generated APIs for all collections
+
+### Frontend (Next.js)
+- **Homepage**: Featured articles and latest news grid
+- **Article Pages**: Full article view with rich text rendering
+- **Category Pages**: Browse articles by category
+- **Author Pages**: Author profiles with their articles
+- **Tag Pages**: Browse articles by tag
+- **Breaking News Bar**: Highlighted breaking news ticker
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+- **SEO Optimized**: Meta tags, Open Graph, and semantic HTML
+- **Image Optimization**: Next.js Image component with automatic optimization
+- **ISR**: Incremental Static Regeneration for fast, up-to-date pages
 
 ## Collections
 
@@ -76,17 +96,19 @@ git clone <repository-url>
 cd payload-news-boilerplate
 ```
 
-2. Install dependencies:
+2. **Backend Setup:**
+
+Install backend dependencies:
 ```bash
 npm install
 ```
 
-3. Create environment file:
+Create environment file:
 ```bash
 cp .env.example .env
 ```
 
-4. Update the `.env` file with your configuration:
+Update the `.env` file with your configuration:
 ```env
 MONGODB_URI=mongodb://localhost:27017/payload-news
 PAYLOAD_SECRET=your-secret-key-here
@@ -99,7 +121,7 @@ PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 openssl rand -base64 32
 ```
 
-5. Start MongoDB (if running locally):
+Start MongoDB (if running locally):
 ```bash
 # macOS with Homebrew
 brew services start mongodb-community
@@ -111,31 +133,57 @@ sudo systemctl start mongod
 docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
+3. **Frontend Setup:**
+
+```bash
+cd frontend
+npm install
+cp .env.local.example .env.local
+```
+
+Update `frontend/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
 ### Running the Application
 
-**Development mode** (with hot reload):
+**Option 1: Run Both (Recommended)**
+
+In one terminal, start the backend:
 ```bash
 npm run dev
 ```
 
-**Build for production**:
+In another terminal, start the frontend:
 ```bash
-npm run build
-npm start
+cd frontend
+npm run dev
 ```
 
-The admin panel will be available at: `http://localhost:3000/admin`
+**Option 2: Run Backend Only**
+
+If you only want the CMS and API:
+```bash
+npm run dev
+```
+
+**URLs:**
+- Frontend: `http://localhost:3001`
+- Backend Admin: `http://localhost:3000/admin`
+- Backend API: `http://localhost:3000/api`
 
 ### First Time Setup
 
 1. Navigate to `http://localhost:3000/admin`
 2. Create your first admin user account
-3. Start creating content!
+3. Create some content (authors, categories, articles)
+4. Visit `http://localhost:3001` to see your frontend!
 
 ## Project Structure
 
 ```
-├── src/
+├── src/                      # Backend source code
 │   ├── collections/          # Payload collections
 │   │   ├── Articles.ts       # Articles collection
 │   │   ├── Authors.ts        # Authors collection
@@ -145,12 +193,35 @@ The admin panel will be available at: `http://localhost:3000/admin`
 │   │   └── Users.ts          # Users collection
 │   ├── payload.config.ts     # Main Payload configuration
 │   └── server.ts             # Express server entry point
+├── frontend/                 # Next.js frontend
+│   ├── src/
+│   │   ├── app/              # Next.js App Router pages
+│   │   │   ├── article/[slug]/  # Article detail pages
+│   │   │   ├── category/[slug]/ # Category pages
+│   │   │   ├── author/[slug]/   # Author pages
+│   │   │   ├── tag/[slug]/      # Tag pages
+│   │   │   ├── layout.tsx    # Root layout
+│   │   │   ├── page.tsx      # Homepage
+│   │   │   └── globals.css   # Global styles
+│   │   ├── components/       # React components
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── ArticleCard.tsx
+│   │   │   └── BreakingNews.tsx
+│   │   ├── lib/              # Utilities
+│   │   │   ├── api.ts        # API client
+│   │   │   ├── utils.ts      # Helper functions
+│   │   │   └── richText.tsx  # Rich text renderer
+│   │   └── types/            # TypeScript types
+│   │       └── index.ts
+│   ├── package.json
+│   └── next.config.js
 ├── media/                    # Uploaded files (auto-generated)
-├── dist/                     # Compiled TypeScript (auto-generated)
-├── .env                      # Environment variables
-├── .env.example              # Environment template
-├── package.json              # Dependencies
-├── tsconfig.json             # TypeScript configuration
+├── dist/                     # Compiled backend (auto-generated)
+├── .env                      # Backend environment variables
+├── .env.example              # Backend environment template
+├── package.json              # Backend dependencies
+├── tsconfig.json             # Backend TypeScript config
 └── nodemon.json              # Nodemon configuration
 ```
 
@@ -238,17 +309,42 @@ This boilerplate can be deployed to serverless platforms with minor adjustments 
 5. Start the server: `npm start`
 6. Use PM2 or similar for process management
 
+## Frontend Pages
+
+The Next.js frontend includes the following pages:
+
+- **Homepage** (`/`): Featured article + latest articles grid
+- **Article Detail** (`/article/[slug]`): Full article with rich text content, author info, tags, and related articles
+- **Category Page** (`/category/[slug]`): All articles in a specific category
+- **Author Page** (`/author/[slug]`): Author profile with their articles
+- **Tag Page** (`/tag/[slug]`): All articles with a specific tag
+
+All pages feature:
+- Server-side rendering (SSR) for SEO
+- Incremental Static Regeneration (ISR) with 60-second revalidation
+- Responsive design with Tailwind CSS
+- Optimized images with Next.js Image component
+
 ## Development Tips
 
+### Backend
 - Use `npm run generate:types` to regenerate TypeScript types after modifying collections
 - The admin UI automatically updates when you modify collections
 - Use Payload's hooks for custom business logic
 - Leverage Payload's built-in authentication for secure API access
 
+### Frontend
+- TypeScript types in `frontend/src/types/index.ts` match the Payload collections
+- API client in `frontend/src/lib/api.ts` handles all backend communication
+- Add new pages by creating files in `frontend/src/app/`
+- Customize styling in `frontend/tailwind.config.js` and `frontend/src/app/globals.css`
+
 ## Resources
 
 - [Payload CMS Documentation](https://payloadcms.com/docs)
 - [Payload CMS GitHub](https://github.com/payloadcms/payload)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [MongoDB Documentation](https://docs.mongodb.com/)
 
 ## License
