@@ -1,8 +1,17 @@
 import Link from 'next/link';
 import { getBreakingNews } from '@/lib/api';
+import { Article } from '@/types';
 
 export async function BreakingNews() {
-  const breakingNews = await getBreakingNews(3);
+  let breakingNews: Article[] = [];
+
+  try {
+    breakingNews = await getBreakingNews(3);
+  } catch (error) {
+    console.error('Error fetching breaking news:', error);
+    // Return null if API is not available
+    return null;
+  }
 
   if (breakingNews.length === 0) return null;
 

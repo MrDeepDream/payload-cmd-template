@@ -1,8 +1,16 @@
 import Link from 'next/link';
 import { getCategories } from '@/lib/api';
+import { Category } from '@/types';
 
 export async function Header() {
-  const categories = await getCategories();
+  let categories: Category[] = [];
+
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    // Return empty array if API is not available
+  }
 
   return (
     <header className="border-b bg-white sticky top-0 z-50 shadow-sm">

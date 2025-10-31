@@ -1,13 +1,23 @@
 import { getFeaturedArticles, getLatestArticles } from '@/lib/api';
 import { ArticleCard } from '@/components/ArticleCard';
+import { Article } from '@/types';
 
+export const dynamic = 'force-dynamic'; // Disable static generation
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function HomePage() {
-  const [featuredArticles, latestArticles] = await Promise.all([
-    getFeaturedArticles(1),
-    getLatestArticles(12),
-  ]);
+  let featuredArticles: Article[] = [];
+  let latestArticles: Article[] = [];
+
+  try {
+    [featuredArticles, latestArticles] = await Promise.all([
+      getFeaturedArticles(1),
+      getLatestArticles(12),
+    ]);
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+    // Return empty arrays if API is not available
+  }
 
   const mainFeatured = featuredArticles[0];
   const otherArticles = latestArticles.filter((article) => article.id !== mainFeatured?.id);
