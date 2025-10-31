@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: payload-news-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: payload-news
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - payload-network
+
+  # Payload CMS Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payload-news-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/payload-news
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET:-change-this-to-a-secure-secret}
+      - PORT=3000
+      - PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3000}
+      - NODE_ENV=production
+    volumes:
+      - ./media:/app/media
+    depends_on:
+      - mongodb
+    networks:
+      - payload-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/admin"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://backend:3000
+    container_name: payload-news-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - payload-network
+
+networks:
+  payload-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

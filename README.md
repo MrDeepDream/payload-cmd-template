@@ -82,13 +82,83 @@ Authentication and authorization with:
 
 ## Getting Started
 
-### Prerequisites
+You can run this project in two ways:
+1. **Docker (Recommended)** - Easiest way to get started
+2. **Manual Setup** - For local development without Docker
 
+### Option 1: Docker Setup (Recommended) 🐳
+
+**Prerequisites:**
+- Docker and Docker Compose installed
+
+**Quick Start:**
+
+1. Clone this repository:
+```bash
+git clone <repository-url>
+cd payload-news-boilerplate
+```
+
+2. Create environment file:
+```bash
+cp .env.docker .env
+```
+
+3. Generate a secure secret:
+```bash
+# On Linux/Mac
+openssl rand -base64 32
+
+# On Windows (PowerShell)
+[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Minimum 0 -Maximum 256 }))
+```
+
+4. Edit `.env` and add your generated secret to `PAYLOAD_SECRET`
+
+5. **Production mode** - Run the entire stack:
+```bash
+docker-compose up -d
+```
+
+Or **Development mode** - Run with hot reload:
+```bash
+docker-compose -f docker-compose.dev.yml up
+```
+
+**Access the application:**
+- Frontend: http://localhost:3001
+- Backend Admin: http://localhost:3000/admin
+- Backend API: http://localhost:3000/api
+
+**Useful Docker Commands:**
+```bash
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes (WARNING: deletes data)
+docker-compose down -v
+
+# View logs
+docker-compose logs -f
+
+# View logs for specific service
+docker-compose logs -f backend
+
+# Rebuild images
+docker-compose build
+
+# Restart a service
+docker-compose restart backend
+```
+
+### Option 2: Manual Installation
+
+**Prerequisites:**
 - Node.js 18+
 - MongoDB 4.4+ (local or cloud instance)
 - npm or yarn
 
-### Installation
+**Installation:**
 
 1. Clone this repository:
 ```bash
@@ -309,6 +379,55 @@ This boilerplate can be deployed to serverless platforms with minor adjustments 
 5. Start the server: `npm start`
 6. Use PM2 or similar for process management
 
+### Deploy with Docker (Recommended for Production)
+
+Docker provides the easiest and most consistent deployment:
+
+1. **On your server**, clone the repository:
+```bash
+git clone <repository-url>
+cd payload-news-boilerplate
+```
+
+2. Create `.env` file:
+```bash
+cp .env.docker .env
+# Edit .env with your production values
+```
+
+3. Update `PAYLOAD_PUBLIC_SERVER_URL` in `.env` to your domain:
+```env
+PAYLOAD_PUBLIC_SERVER_URL=https://yourdomain.com
+```
+
+4. Build and run:
+```bash
+docker-compose up -d
+```
+
+5. Set up nginx or traefik as reverse proxy for SSL
+
+**Docker Deployment Benefits:**
+- Consistent environment across dev/staging/prod
+- Easy scaling with docker-compose scale
+- MongoDB included and configured
+- Automatic restarts on failure
+- Simple rollbacks with image tags
+
+**Docker Production Tips:**
+```bash
+# Update to latest version
+git pull
+docker-compose build
+docker-compose up -d
+
+# Backup MongoDB data
+docker-compose exec mongodb mongodump --out /backup
+
+# View production logs
+docker-compose logs -f --tail=100
+```
+
 ## Frontend Pages
 
 The Next.js frontend includes the following pages:
@@ -338,6 +457,73 @@ All pages feature:
 - API client in `frontend/src/lib/api.ts` handles all backend communication
 - Add new pages by creating files in `frontend/src/app/`
 - Customize styling in `frontend/tailwind.config.js` and `frontend/src/app/globals.css`
+
+### Docker
+- Use `docker-compose.dev.yml` for development with hot reload
+- Use `docker-compose.yml` for production builds
+- Data persists in Docker volumes even after `docker-compose down`
+- Access container shells: `docker-compose exec backend sh`
+
+## Troubleshooting
+
+### Docker Issues
+
+**Port already in use:**
+```bash
+# Check what's using the port
+lsof -i :3000  # Mac/Linux
+netstat -ano | findstr :3000  # Windows
+
+# Change ports in docker-compose.yml if needed
+```
+
+**Frontend can't connect to backend:**
+- Ensure backend is fully started (check logs: `docker-compose logs backend`)
+- Try accessing http://localhost:3000/api/articles directly
+- Check `NEXT_PUBLIC_API_URL` in frontend environment
+
+**MongoDB connection issues:**
+```bash
+# Check MongoDB is running
+docker-compose ps
+
+# Check MongoDB logs
+docker-compose logs mongodb
+
+# Restart MongoDB
+docker-compose restart mongodb
+```
+
+**Build failures:**
+```bash
+# Clear Docker cache and rebuild
+docker-compose down
+docker system prune -a
+docker-compose build --no-cache
+docker-compose up
+```
+
+### Manual Setup Issues
+
+**MongoDB connection refused:**
+- Ensure MongoDB is running: `sudo systemctl status mongod`
+- Check connection string in `.env`
+- Try: `mongodb://127.0.0.1:27017/payload-news` instead of `localhost`
+
+**TypeScript errors:**
+```bash
+# Regenerate types
+npm run generate:types
+
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Frontend shows "No articles found":**
+- Create content in the admin panel first
+- Check API is accessible: http://localhost:3000/api/articles
+- Verify `NEXT_PUBLIC_API_URL` in `frontend/.env.local`
 
 ## Resources
 
