@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload/config';
 import { mongooseAdapter } from '@payloadcms/db-mongodb';
 import { slateEditor } from '@payloadcms/richtext-slate';
+import { webpackBundler } from '@payloadcms/bundler-webpack';
 import path from 'path';
 import Users from './collections/Users';
 import Articles from './collections/Articles';
@@ -13,6 +14,7 @@ export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000',
   admin: {
     user: Users.slug,
+    bundler: webpackBundler(),
     meta: {
       titleSuffix: '- News CMS',
       favicon: '/assets/favicon.ico',
